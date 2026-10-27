@@ -19,6 +19,16 @@ app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), na
 @app.on_event("startup")
 def startup():
     init_db()
+    db = SessionLocal()
+    try:
+        if db.query(Employee).count() == 0:
+            # seed sample data
+            import seed
+            seed.seed()
+    except Exception as e:
+        print("seed error", e)
+    finally:
+        db.close()
 
 def db_session():
     db = SessionLocal()
