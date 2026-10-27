@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Backup Suggestions</h1>
+<p class="mb-2">Candidates to cover for employee {{employee_id}} on {{d}}:</p>
+<ul class="bg-white rounded shadow p-4">
+  {% for c in candidates %}
+    <li>{{c.name}} ({{c.email}})</li>
+  {% else %}
+    <li class="text-red-600">No backup candidates found.</li>
+  {% endfor %}
+</ul>
+<a href="/roster/{{rid}}" class="text-indigo-600 hover:underline mt-3 inline-block">Back</a>
+{% endblock %}

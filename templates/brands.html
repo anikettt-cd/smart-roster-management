@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Brands</h1>
+<table class="w-full bg-white rounded shadow text-sm">
+  <thead><tr class="bg-gray-100"><th class="p-2 text-left">Brand</th><th class="p-2 text-left">Pod</th><th class="p-2 text-left">Assigned Employees</th></tr></thead>
+  <tbody>
+  {% for b in brands %}
+    <tr class="border-t">
+      <td class="p-2 font-semibold">{{b.name}}</td>
+      <td class="p-2">{{b.pod.name if b.pod else ''}}</td>
+      <td class="p-2">
+        {% for a in b.assignments %}
+          {{a.employee.name}} ({{a.process.name}}){% if not loop.last %}, {% endif %}
+        {% endfor %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

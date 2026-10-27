@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Employees</h1>
+<form method="post" action="/employees/add" class="bg-white p-4 rounded shadow mb-4 flex gap-2 items-end flex-wrap">
+  <div><label class="block text-sm">Name</label><input name="name" class="border rounded px-2 py-1" required></div>
+  <div><label class="block text-sm">Pod</label>
+    <select name="pod_id" class="border rounded px-2 py-1">
+      {% for p in pods %}<option value="{{p.id}}">{{p.name}}</option>{% endfor %}
+    </select></div>
+  <div><label class="block text-sm">Role</label>
+    <select name="role" class="border rounded px-2 py-1"><option value="employee">employee</option><option value="pod_lead">pod_lead</option></select></div>
+  <div><label class="block text-sm">Weekly offs (0=Mon..6=Sun, comma)</label><input name="weekly_offs" value="6" class="border rounded px-2 py-1"></div>
+  <button class="bg-indigo-600 text-white px-4 py-2 rounded">Add</button>
+</form>
+<table class="w-full bg-white rounded shadow text-sm">
+  <thead><tr class="bg-gray-100"><th class="p-2 text-left">Name</th><th class="p-2 text-left">Pod</th><th class="p-2 text-left">Role</th><th class="p-2 text-left">Weekly offs</th></tr></thead>
+  <tbody>
+  {% for e in employees %}
+    <tr class="border-t"><td class="p-2">{{e.name}}</td><td class="p-2">{{e.pod.name if e.pod else ''}}</td><td class="p-2">{{e.role}}</td><td class="p-2">{{e.weekly_offs}}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

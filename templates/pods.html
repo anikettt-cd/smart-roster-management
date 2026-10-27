@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Pods</h1>
+<table class="w-full bg-white rounded shadow text-sm">
+  <thead><tr class="bg-gray-100"><th class="p-2 text-left">Pod</th><th class="p-2 text-left">Lead</th><th class="p-2 text-left">Members</th></tr></thead>
+  <tbody>
+  {% for p in pods %}
+    <tr class="border-t">
+      <td class="p-2 font-semibold">{{p.name}}</td>
+      <td class="p-2">{% if p.lead_employee_id %}{{p.lead_employee_id}}{% endif %}</td>
+      <td class="p-2">{% for e in employees %}{% if e.pod_id==p.id %}{{e.name}}{% if not loop.last %}, {% endif %}{% endif %}{% endfor %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

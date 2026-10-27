@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Smart Roster Management System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+  <nav class="bg-indigo-700 text-white px-4 py-3 flex flex-wrap gap-3 items-center">
+    <a href="/" class="font-bold text-lg">SmartRoster</a>
+    <a href="/employees" class="hover:underline">Employees</a>
+    <a href="/pods" class="hover:underline">Pods</a>
+    <a href="/brands" class="hover:underline">Brands</a>
+    <a href="/processes" class="hover:underline">Processes</a>
+    <a href="/assignments" class="hover:underline">Assignments</a>
+    <a href="/requirements" class="hover:underline">Requirements</a>
+    <a href="/holidays" class="hover:underline">Holidays</a>
+    <a href="/leaves" class="hover:underline">Leaves</a>
+  </nav>
+  <main class="p-4 max-w-7xl mx-auto">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Brand-Process Requirements</h1>
+<form method="post" action="/requirements/add" class="bg-white p-4 rounded shadow mb-4 flex gap-2 items-end flex-wrap">
+  <div><label class="block text-sm">Brand</label>
+    <select name="brand_id" class="border rounded px-2 py-1">{% for b in brands %}<option value="{{b.id}}">{{b.name}}</option>{% endfor %}</select></div>
+  <div><label class="block text-sm">Process</label>
+    <select name="process_id" class="border rounded px-2 py-1">{% for p in processes %}<option value="{{p.id}}">{{p.name}}</option>{% endfor %}</select></div>
+  <div><label class="block text-sm">Calendar</label>
+    <select name="operating_calendar" class="border rounded px-2 py-1">
+      <option value="365">365 (all days)</option>
+      <option value="daily_no_holidays">Daily, holidays off</option>
+      <option value="sun_holidays_off">Sun + holidays off</option>
+    </select></div>
+  <div><label class="block text-sm">Min staff/day</label><input name="min_staff_per_day" type="number" value="1" class="border rounded px-2 py-1"></div>
+  <button class="bg-indigo-600 text-white px-4 py-2 rounded">Add</button>
+</form>
+<table class="w-full bg-white rounded shadow text-sm">
+  <thead><tr class="bg-gray-100"><th class="p-2 text-left">Brand</th><th class="p-2 text-left">Process</th><th class="p-2 text-left">Calendar</th><th class="p-2 text-left">Min Staff</th></tr></thead>
+  <tbody>
+  {% for r in reqs %}
+    <tr class="border-t"><td class="p-2">{{r.brand.name}}</td><td class="p-2">{{r.process.name}}</td><td class="p-2">{{r.operating_calendar}}</td><td class="p-2">{{r.min_staff_per_day}}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

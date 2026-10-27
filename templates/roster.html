@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-2">Roster {{roster.year}}-{{roster.month}} ({{roster.status}})</h1>
+<form method="get" action="/roster/{{roster.id}}" class="bg-white p-3 rounded shadow mb-3 flex gap-2 items-end flex-wrap text-sm">
+  <div><label class="block">View</label>
+    <select name="view" class="border rounded px-2 py-1">
+      <option value="company" {% if view=='company' %}selected{% endif %}>Company</option>
+      <option value="pod" {% if view=='pod' %}selected{% endif %}>Pod</option>
+      <option value="brand" {% if view=='brand' %}selected{% endif %}>Brand</option>
+      <option value="process" {% if view=='process' %}selected{% endif %}>Process</option>
+      <option value="employee" {% if view=='employee' %}selected{% endif %}>Employee</option>
+    </select></div>
+  <div><label class="block">Pod</label>
+    <select name="pod_id" class="border rounded px-2 py-1"><option value="">All</option>{% for p in pods %}<option value="{{p.id}}" {% if pod_id==p.id %}selected{% endif %}>{{p.name}}</option>{% endfor %}</select></div>
+  <div><label class="block">Brand</label>
+    <select name="brand_id" class="border rounded px-2 py-1"><option value="">All</option>{% for b in brands %}<option value="{{b.id}}" {% if brand_id==b.id %}selected{% endif %}>{{b.name}}</option>{% endfor %}</select></div>
+  <div><label class="block">Process</label>
+    <select name="process_id" class="border rounded px-2 py-1"><option value="">All</option>{% for p in processes %}<option value="{{p.id}}" {% if process_id==p.id %}selected{% endif %}>{{p.name}}</option>{% endfor %}</select></div>
+  <div><label class="block">Employee</label>
+    <select name="employee_id" class="border rounded px-2 py-1"><option value="">All</option>{% for e in all_employees %}<option value="{{e.id}}" {% if employee_id==e.id %}selected{% endif %}>{{e.name}}</option>{% endfor %}</select></div>
+  <button class="bg-indigo-600 text-white px-3 py-1 rounded">Apply</button>
+  <a href="/roster/{{roster.id}}/conflicts" class="ml-2 text-red-600 hover:underline">Conflicts</a>
+</form>
+{% if cov_summary %}
+<h2 class="text-lg font-semibold mb-2">Coverage (brand)</h2>
+<table class="w-full bg-white rounded shadow text-xs mb-3">
+  <thead><tr class="bg-gray-100"><th class="p-1 text-left">Process</th>{% for d in dates %}<th class="p-1 text-center">{{d.day}}</th>{% endfor %}</tr></thead>
+  <tbody>
+  {% for pname, (r, counts) in cov_summary.items() %}
+    <tr class="border-t"><td class="p-1 font-semibold">{{pname}} (req {{r.min_staff_per_day}})</td>
+      {% for d in dates %}
+        {% set c = counts[d] %}
+        <td class="p-1 text-center {% if c < r.min_staff_per_day %}bg-red-200{% else %}bg-green-100{% endif %}">{{c}}</td>
+      {% endfor %}
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+<div class="overflow-auto bg-white rounded shadow">
+<table class="text-xs border-collapse">
+  <thead>
+    <tr class="bg-gray-100">
+      <th class="p-1 border sticky left-0 bg-gray-100">Employee</th>
+      {% for d in dates %}
+        <th class="p-1 border text-center {% if d.weekday()==6 %}bg-yellow-100{% endif %}">{{d.day}}<br><span class="text-[9px]">{{d.strftime('%a')}}</span></th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+  {% for e in employees %}
+    <tr class="border-t">
+      <td class="p-1 border sticky left-0 bg-white font-semibold">{{e.name}}</td>
+      {% for d in dates %}
+        {% set en = entry_map.get((e.id, d)) %}
+        <td class="p-1 border text-center
+          {% if en and en.status=='working' %}bg-green-50
+          {% elif en and en.status=='leave' %}bg-red-100
+          {% elif en and en.status=='holiday' %}bg-blue-100
+          {% endif %}">
+          {% if en %}
+            {% if en.status=='working' %}
+              {% if en.brand %}{{en.brand.name[:6]}}{% endif %}<br><span class="text-[9px]">{% if en.process %}{{en.process.name[:4]}}{% endif %}</span>
+              {% if en.is_preferred_off_overridden %}*{% endif %}
+            {% elif en.status=='leave' %}L
+            {% elif en.status=='holiday' %}H
+            {% elif en.status=='comp_off' %}C
+            {% else %}OFF
+            {% endif %}
+          {% else %}-{% endif %}
+        </td>
+      {% endfor %}
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<p class="text-xs mt-2 text-gray-500">Legend: green=working, red=leave, blue=holiday, OFF=off, *=preferred off overridden.</p>
+
+<h2 class="text-lg font-semibold mt-4 mb-2">Edit Entry</h2>
+<form method="post" action="/roster/{{roster.id}}/entry/update" class="bg-white p-3 rounded shadow flex gap-2 items-end flex-wrap text-sm">
+  <div><label class="block">Employee</label>
+    <select name="employee_id" class="border rounded px-2 py-1">{% for e in all_employees %}<option value="{{e.id}}">{{e.name}}</option>{% endfor %}</select></div>
+  <div><label class="block">Date</label><input name="d" type="date" class="border rounded px-2 py-1" required></div>
+  <div><label class="block">Status</label>
+    <select name="status" class="border rounded px-2 py-1">
+      <option value="working">working</option><option value="off">off</option><option value="leave">leave</option><option value="holiday">holiday</option></select></div>
+  <div><label class="block">Brand</label>
+    <select name="brand_id" class="border rounded px-2 py-1"><option value="">None</option>{% for b in brands %}<option value="{{b.id}}">{{b.name}}</option>{% endfor %}</select></div>
+  <div><label class="block">Process</label>
+    <select name="process_id" class="border rounded px-2 py-1"><option value="">None</option>{% for p in processes %}<option value="{{p.id}}">{{p.name}}</option>{% endfor %}</select></div>
+  <button class="bg-indigo-600 text-white px-3 py-1 rounded">Update</button>
+</form>
+
+<h2 class="text-lg font-semibold mt-4 mb-2">Handle Change: mark employee unavailable</h2>
+<form method="post" action="/change/unavailable" class="bg-white p-3 rounded shadow flex gap-2 items-end flex-wrap text-sm">
+  <div><label class="block">Employee</label>
+    <select name="employee_id" class="border rounded px-2 py-1">{% for e in all_employees %}<option value="{{e.id}}">{{e.name}}</option>{% endfor %}</select></div>
+  <div><label class="block">Date</label><input name="d" type="date" class="border rounded px-2 py-1" required></div>
+  <button class="bg-red-600 text-white px-3 py-1 rounded">Mark Unavailable</button>
+</form>
+
+<form method="post" action="/roster/{{roster.id}}/publish" class="mt-3">
+  <button class="bg-green-600 text-white px-4 py-2 rounded">Publish Roster</button>
+</form>
+{% endblock %}
+
